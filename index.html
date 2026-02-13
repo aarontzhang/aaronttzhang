@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AARON ZHANG</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none !important;
+        }
+
+        #custom-cursor {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 99999;
+        }
+
+        #custom-cursor svg path {
+            transition: stroke-dashoffset 0.25s ease;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Space Mono', monospace;
+            background: #0c0c0c;
+            color: #f5f5f5;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Smooth content container for inertia scroll */
+        .smooth-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            will-change: transform;
+        }
+
+        :root {
+            --red: #c8272e;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .hero-name {
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #f5f5f5;
+            line-height: 0.85;
+            letter-spacing: -0.05em;
+            position: relative;
+        }
+
+
+
+        .hero-name .line1 {
+            font-size: clamp(8rem, 22vw, 28rem);
+            margin-left: -0.02em;
+        }
+
+        .hero-name .line2 {
+            font-size: clamp(8rem, 22vw, 28rem);
+            margin-left: 12vw;
+            margin-top: -2vw;
+        }
+
+        .hero-label {
+            position: absolute;
+            font-size: 10px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #f5f5f5;
+        }
+
+        .hero-label.bottom-left {
+            bottom: 40px;
+            left: 40px;
+        }
+
+        .hero-label.bottom-right {
+            bottom: 40px;
+            right: 40px;
+        }
+
+        /* ─── SCROLL REVEAL SYSTEM ─── */
+        [data-reveal] {
+            opacity: 0;
+        }
+
+        [data-reveal].visible {
+            opacity: 1;
+        }
+
+        /* Grid reveal overlay */
+        .grid-reveal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .grid-reveal-overlay .cell {
+            background: #0c0c0c;
+            transition: opacity 0.05s steps(1);
+        }
+
+        .grid-reveal-overlay .cell.gone {
+            opacity: 0;
+        }
+
+        /* Subtle reveal for sub-elements — triggered independently */
+        .sub-slot {
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .sub-slot.sub-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .project-info .one-liner,
+        .project-info .skills,
+        .project-info .label {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .project-info .label.sub-visible { opacity: 1; transform: translateY(0); }
+        .project-info .one-liner.sub-visible { opacity: 1; transform: translateY(0); transition-delay: 0.1s; }
+        .project-info .skills.sub-visible { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
+
+        /* ─── ABOUT SECTION ─── */
+        .about-section {
+            display: flex;
+            gap: 60px;
+            padding: 4vh 8vw 2vh;
+            align-items: center;
+        }
+
+        .about-photo {
+            flex: 0 0 360px;
+            height: 340px;
+            background: rgba(255,255,255,0.03);
+            overflow: hidden;
+        }
+
+        .about-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 20%;
+            display: block;
+            filter: grayscale(100%);
+            transition: filter 0.8s ease, transform 0.6s ease;
+        }
+
+        .about-photo.in-focus img {
+            filter: grayscale(0%);
+        }
+
+        .about-photo:hover img {
+            transform: scale(1.03);
+        }
+
+        .about-text .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #555;
+            margin-bottom: 3vh;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .about-text p {
+            font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+            font-weight: 400;
+            line-height: 1.5;
+            max-width: 600px;
+            word-spacing: 0.1em;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: opacity 0.5s ease 0.1s, transform 0.5s ease 0.1s;
+        }
+
+        .about-text .label.sub-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about-text p.sub-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ─── MAIN CONTENT ─── */
+        .content {
+            padding-bottom: 80px;
+        }
+
+        /* ─── PROJECT SECTIONS ─── */
+        .project {
+            margin-top: 18vh;
+        }
+
+        /* Main image */
+        .project-main {
+            position: relative;
+            width: 78%;
+            overflow: hidden;
+        }
+
+        .project:nth-child(odd) .project-main {
+            margin-left: 0;
+        }
+
+        .project:nth-child(even) .project-main {
+            margin-left: auto;
+        }
+
+        .project-main img {
+            display: block;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.8s ease, transform 0.6s ease;
+            will-change: transform, filter;
+        }
+
+        .project-main.in-focus img {
+            filter: grayscale(0%);
+        }
+
+        /* Title */
+        .project-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #f5f5f5;
+            font-size: clamp(3rem, 9vw, 7.5rem);
+            line-height: 0.85;
+            letter-spacing: -0.04em;
+            margin-top: -6vw;
+            position: relative;
+            z-index: 10;
+        }
+
+        .project:nth-child(odd) .project-title {
+            padding-left: 5vw;
+            text-align: left;
+        }
+
+        .project:nth-child(even) .project-title {
+            padding-right: 5vw;
+            text-align: right;
+        }
+
+        /* Description */
+        .project-info {
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.6;
+            max-width: 460px;
+            margin-top: 4vh;
+        }
+
+        .project:nth-child(odd) .project-info {
+            margin-left: auto;
+            margin-right: 6vw;
+            text-align: right;
+        }
+
+        .project:nth-child(even) .project-info {
+            margin-left: 6vw;
+            text-align: left;
+        }
+
+        .project-info .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .project-info .one-liner {
+            margin-bottom: 12px;
+            color: #ccc;
+        }
+
+        .project-info .skills {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #444;
+        }
+
+        /* Sub-images */
+        .project-subs {
+            display: flex;
+            align-items: flex-start;
+            margin-top: 4vh;
+            width: 78%;
+            gap: 0;
+        }
+
+        .project:nth-child(odd) .project-subs {
+            margin-left: 0;
+        }
+
+        .project:nth-child(even) .project-subs {
+            margin-left: auto;
+        }
+
+        .project-subs .sub-slot {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .project-subs .sub-slot:nth-child(1) {
+            width: 38%;
+            aspect-ratio: 4 / 3;
+            margin-top: 0;
+        }
+
+        .project-subs .sub-slot:nth-child(2) {
+            width: 30%;
+            aspect-ratio: 1 / 1;
+            margin-left: -4%;
+            margin-top: 6%;
+            z-index: 1;
+        }
+
+        .project-subs .sub-slot:nth-child(3) {
+            width: 34%;
+            aspect-ratio: 3 / 2;
+            margin-left: -3%;
+            margin-top: -2%;
+            z-index: 2;
+        }
+
+        .project:nth-child(even) .project-subs .sub-slot:nth-child(1) {
+            order: 3;
+            margin-left: -4%;
+        }
+
+        .project:nth-child(even) .project-subs .sub-slot:nth-child(2) {
+            order: 2;
+            margin-left: -3%;
+        }
+
+        .project:nth-child(even) .project-subs .sub-slot:nth-child(3) {
+            order: 1;
+            margin-left: 0;
+        }
+
+        .project-subs .sub-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.8s ease, transform 0.6s ease;
+        }
+
+        .project-subs .sub-slot.in-focus img {
+            filter: grayscale(0%);
+        }
+
+        .project-subs .sub-slot:hover img {
+            transform: scale(1.04);
+        }
+
+        /* ─── MORE SECTION ─── */
+        .more-section {
+            margin-top: 18vh;
+            padding: 0 8vw;
+        }
+
+        .more-toggle {
+            font-family: 'Space Mono', monospace;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #555;
+            background: none;
+            border: none;
+            border-top: 1px solid rgba(255,255,255,0.12);
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+            cursor: pointer;
+            padding: 32px 0;
+            width: 100%;
+            text-align: left;
+            transition: color 0.3s ease, border-color 0.3s ease, letter-spacing 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .more-toggle:hover {
+            color: #f5f5f5;
+            border-color: rgba(255,255,255,0.4);
+            letter-spacing: 0.2em;
+        }
+
+        .more-toggle .icon {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            transition: transform 0.3s ease;
+        }
+
+        .more-toggle.open .icon {
+            transform: rotate(45deg);
+        }
+
+        .more-items {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease;
+        }
+
+        .more-items.open {
+            max-height: 1200px;
+        }
+
+        .more-item {
+            padding: 32px 0;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            transform: translateX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .more-item:hover {
+            transform: translateX(12px);
+        }
+
+        .more-item:last-child {
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .more-item h3 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+
+        .more-item .meta {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 8px;
+        }
+
+        .more-item .skills {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: #444;
+        }
+
+        /* ─── CONTACT ─── */
+        .contact {
+            margin-top: 20vh;
+            margin-bottom: 8vh;
+            padding: 0 8vw;
+        }
+
+        .contact-heading {
+            font-size: clamp(3rem, 9vw, 7.5rem);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: -0.04em;
+            line-height: 0.85;
+            margin-bottom: 5vh;
+        }
+
+        .contact-links {
+            display: flex;
+            gap: 5vw;
+        }
+
+        .contact a {
+            font-size: clamp(0.9rem, 1.5vw, 1.2rem);
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #888;
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .contact a:hover {
+            color: #f5f5f5;
+        }
+
+        .contact-links a {
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.4s ease, transform 0.4s ease, color 0.2s ease;
+        }
+
+        .contact-links a.sub-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            html {
+                scroll-snap-type: y proximity;
+            }
+
+            .hero {
+                height: 100vh;
+                scroll-snap-align: start;
+            }
+
+            .hero-name .line1,
+            .hero-name .line2 {
+                font-size: clamp(3.5rem, 16vw, 7rem);
+                margin-left: 0;
+            }
+
+            .hero-name .line2 {
+                margin-top: 0;
+                margin-left: 4vw;
+            }
+
+            .hero-label {
+                font-size: 8px;
+            }
+
+            .hero-label.bottom-left,
+            .hero-label.bottom-right {
+                bottom: 20px;
+            }
+
+            .hero-label.bottom-left {
+                left: 20px;
+            }
+
+            .hero-label.bottom-right {
+                right: 20px;
+            }
+
+            .about-section {
+                flex-direction: column;
+                min-height: 100vh;
+                padding: 0 20px;
+                gap: 32px;
+                justify-content: center;
+                scroll-snap-align: start;
+            }
+
+            .about-photo {
+                flex: none;
+                width: 100%;
+                height: 35vh;
+            }
+
+            .about-text .label {
+                margin-bottom: 2vh;
+            }
+
+            .about-text p {
+                font-size: clamp(0.9rem, 3.8vw, 1.3rem);
+            }
+
+            .content {
+                padding-bottom: 0;
+            }
+
+            .project {
+                min-height: 100vh;
+                margin-top: 0;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                padding: 24px 0;
+                gap: 0;
+                scroll-snap-align: start;
+            }
+
+            .project-main,
+            .project-subs {
+                width: 100%;
+            }
+
+            .project-main img {
+                aspect-ratio: 16 / 9;
+            }
+
+            .project-title {
+                font-size: clamp(2rem, 10vw, 3.5rem);
+                margin-top: -8vw;
+                padding-left: 16px !important;
+                padding-right: 16px !important;
+            }
+
+            .project-info {
+                margin-left: 16px !important;
+                margin-right: 16px !important;
+                text-align: left !important;
+                margin-top: 3vh;
+                font-size: 12px;
+                max-width: 100%;
+            }
+
+            .project-info .one-liner {
+                font-size: 12px;
+                line-height: 1.5;
+                margin-bottom: 16px;
+            }
+
+            .project-info .label {
+                font-size: 9px;
+                margin-bottom: 12px;
+            }
+
+            .project-info .skills {
+                font-size: 9px;
+            }
+
+            .project-subs {
+                margin-top: 3vh !important;
+            }
+
+            .project-subs .sub-slot:nth-child(1),
+            .project-subs .sub-slot:nth-child(2),
+            .project-subs .sub-slot:nth-child(3) {
+                margin-top: 0 !important;
+                margin-left: 0 !important;
+            }
+
+            .project:nth-child(even) .project-subs .sub-slot:nth-child(1),
+            .project:nth-child(even) .project-subs .sub-slot:nth-child(2),
+            .project:nth-child(even) .project-subs .sub-slot:nth-child(3) {
+                margin-left: 0 !important;
+            }
+
+            .more-section {
+                min-height: 100vh;
+                margin-top: 0;
+                padding: 0 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                scroll-snap-align: start;
+            }
+
+            .more-toggle {
+                font-size: clamp(1rem, 4vw, 1.4rem);
+                padding: 24px 0;
+            }
+
+            .more-item {
+                padding: 20px 0;
+            }
+
+            .more-item h3 {
+                font-size: clamp(1.2rem, 5vw, 2rem);
+            }
+
+            .more-item .meta {
+                font-size: 11px;
+            }
+
+            .contact {
+                min-height: 50vh;
+                margin-top: 0;
+                margin-bottom: 0;
+                padding: 0 20px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                scroll-snap-align: start;
+            }
+
+            .contact-heading {
+                font-size: clamp(2rem, 10vw, 3.5rem);
+                margin-bottom: 3vh;
+            }
+
+            .contact-links {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .contact a {
+                font-size: clamp(0.85rem, 3.5vw, 1.1rem);
+            }
+
+        }
+
+        /* Hide custom cursor on touch devices */
+        @media (hover: none), (pointer: coarse) {
+            * {
+                cursor: auto !important;
+            }
+            #custom-cursor {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="smooth-wrapper" id="smoothWrapper">
+    <!-- HERO -->
+    <section class="hero">
+        <div class="hero-name">
+            <div class="line1"><span>AARON</span></div>
+            <div class="line2"><span>ZHANG</span></div>
+        </div>
+        <div class="hero-label bottom-left">PROFESSIONAL VIBE CODER</div>
+        <div class="hero-label bottom-right">BOSTON &rarr; LOS ANGELES</div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about-section" data-reveal>
+        <div class="about-photo">
+            <img src="aaron copy.jpg" alt="Aaron Zhang" onerror="this.style.opacity='0'">
+        </div>
+        <div class="about-text">
+            <div class="label">ABOUT</div>
+            <p>Student at Claremont McKenna. CS at Harvey Mudd. I love tech, startups, and building cool stuff.</p>
+        </div>
+    </section>
+
+    <!-- CONTENT -->
+    <main class="content">
+
+        <!-- 01: CLAREMONT ACCELERATOR (left) -->
+        <div class="project" data-reveal>
+            <div class="project-main" data-parallax>
+                <img src="Claremont.jpg" alt="Claremont McKenna" onerror="this.style.opacity='0'">
+            </div>
+            <div class="project-title">CLAREMONT<br>ACCELERATOR</div>
+            <div class="project-info">
+                <div class="label">01 — VICE PRESIDENT</div>
+                <div class="one-liner">Running the largest startup accelerator at the Claremont Colleges — enabling student founders to start and scale their startups by deploying $100K+ annually into their ventures.</div>
+                <div class="skills">STARTUPS · VENTURE CAPITAL · LEADERSHIP</div>
+            </div>
+            <div class="project-subs">
+                <div class="sub-slot" style="aspect-ratio:4/3; width:42%; z-index:3; background:#000"><img src="Claremont accelerator.png" alt="Claremont Accelerator logo" style="object-fit:contain"></div>
+                <div class="sub-slot" style="aspect-ratio:1920/1280; width:30%; z-index:4; margin-top:5%"><img src="Accelerator.jpg" alt="Accelerator team"></div>
+                <div class="sub-slot" style="aspect-ratio:778/528; width:32%; margin-top:-1%"><img src="Accelerator event.png" alt="Accelerator event"></div>
+            </div>
+        </div>
+
+        <!-- 02: WAYLENS (right) -->
+        <div class="project" data-reveal>
+            <div class="project-main" data-parallax>
+                <img src="Waylens.webp" alt="Waylens Camera" onerror="this.style.opacity='0'">
+            </div>
+            <div class="project-title">WAYLENS</div>
+            <div class="project-info">
+                <div class="label">02 — SOFTWARE ENGINEER</div>
+                <div class="one-liner">Built AI-powered fleet safety tools — developed RAG for industry and competitor analysis, benchmarked vision models, revamped driver coaching audio, and automated real-time news aggregation.</div>
+                <div class="skills">AI/ML · RAG SYSTEMS · PYTHON</div>
+            </div>
+            <div class="project-subs">
+                <div class="sub-slot" style="aspect-ratio:2780/1582; width:44%; z-index:3"><img src="Waylens Horizon.png" alt="Waylens Safety Dashboard"></div>
+                <div class="sub-slot" style="aspect-ratio:1140/760; width:28%; margin-top:8%"><img src="Waylens parts.jpg" alt="Waylens Parts"></div>
+                <div class="sub-slot" style="aspect-ratio:554/550; width:24%; margin-top:3%"><img src="Waylens voice.png" alt="Waylens Voicelines"></div>
+            </div>
+        </div>
+
+        <!-- 03: MIT MEDIA LAB (left) -->
+        <div class="project" data-reveal>
+            <div class="project-main" data-parallax>
+                <img src="Media Lab.jpg" alt="MIT Media Lab" onerror="this.style.opacity='0'">
+            </div>
+            <div class="project-title">MIT<br>MEDIA LAB</div>
+            <div class="project-info">
+                <div class="label">03 — RESEARCH INTERN</div>
+                <div class="one-liner">Built computer vision systems with OpenCV to model urban environments and optimize transportation at the City Science lab in Taipei.</div>
+                <div class="skills">COMPUTER VISION · OPENCV · AI RESEARCH</div>
+            </div>
+            <div class="project-subs">
+                <div class="sub-slot" style="aspect-ratio:1479/1109; width:30%"><img src="MIT Media Lab.jpg" alt="MIT Media Lab Team"></div>
+                <div class="sub-slot" style="aspect-ratio:750/422; width:40%; z-index:2; margin-top:4%"><img src="MIT.jpg" alt="MIT City Model"></div>
+                <div class="sub-slot" style="aspect-ratio:2108/1360; width:28%; margin-top:-1%"><img src="MIT Media.png" alt="MIT Media Lab Close-up"></div>
+            </div>
+        </div>
+
+        <!-- 04: FLEX COMPUTE (right) -->
+        <div class="project" data-reveal>
+            <div class="project-main" data-parallax>
+                <img src="Flexcompute.jpg" alt="Flex Compute" onerror="this.style.opacity='0'">
+            </div>
+            <div class="project-title">FLEX<br>COMPUTE</div>
+            <div class="project-info">
+                <div class="label">04 — ANALYST</div>
+                <div class="one-liner">Developed pricing models and competitive market analysis for Flow360, a GPU-accelerated computational fluid dynamics platform used in aerospace and automotive.</div>
+                <div class="skills">ANALYSIS · GPU COMPUTING · STRATEGY</div>
+            </div>
+            <div class="project-subs">
+                <div class="sub-slot" style="aspect-ratio:3004/1674; width:40%; background:#0a1628"><img src="Flexcompute Cycle.png" alt="Flexcompute Cycle"></div>
+                <div class="sub-slot" style="aspect-ratio:1128/634; width:32%; margin-top:5%; background:#0a1628"><img src="Flexcompute.png" alt="Flexcompute"></div>
+                <div class="sub-slot" style="aspect-ratio:2264/1390; width:30%; margin-top:-2%; background:#0a1628"><img src="Flexcompute Jet.png" alt="Flexcompute Jet"></div>
+            </div>
+        </div>
+
+        <!-- MORE SECTION -->
+        <section class="more-section" data-reveal>
+            <button class="more-toggle" onclick="toggleMore()" id="moreBtn">
+                MORE <span class="icon">+</span>
+            </button>
+            <div class="more-items" id="moreItems">
+                <div class="more-item">
+                    <h3>5C EVENTS</h3>
+                    <div class="meta">Founder & Developer — Built an events app for the Claremont Colleges. 2,000 users.</div>
+                    <div class="skills">FULL-STACK · PRODUCT · APP DEVELOPMENT</div>
+                </div>
+                <div class="more-item">
+                    <h3>NEXTGEN SUMMIT</h3>
+                    <div class="meta">Project Leader — Student-led entrepreneurship conference. 100+ attendees, $43K in sponsorships.</div>
+                    <div class="skills">EVENT PLANNING · FUNDRAISING · LEADERSHIP</div>
+                </div>
+                <div class="more-item">
+                    <h3>SPARKATHON</h3>
+                    <div class="meta">3rd place — Pomona Ventures hackathon + pitch competition.</div>
+                    <div class="skills">HACKATHON · PITCHING · RAPID PROTOTYPING</div>
+                </div>
+                <div class="more-item">
+                    <h3>SOLITHY</h3>
+                    <div class="meta">#1 global Clash of Clans player. 7K+ subscribers, 500K views, $3.5K/mo.</div>
+                    <div class="skills">YOUTUBE · CONTENT CREATION · AUDIENCE GROWTH</div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- CONTACT -->
+        <section class="contact" data-reveal>
+            <div class="contact-heading">CONTACT</div>
+            <div class="contact-links">
+                <a href="mailto:azhang28@cmc.edu">EMAIL</a>
+                <a href="https://linkedin.com/in/aaronttzhang" target="_blank">LINKEDIN</a>
+                <a href="https://github.com/aarontzhang" target="_blank">GITHUB</a>
+            </div>
+        </section>
+    </main>
+</div>
+
+    <script>
+        // TEXT SCRAMBLE EFFECT
+        (function() {
+            var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+            // Each character locks in at a random time (not left-to-right)
+            function scramble(el, target, duration, delay) {
+                var len = target.length;
+                // Generate random lock-in time for each character
+                var lockTimes = [];
+                for (var i = 0; i < len; i++) {
+                    if (target[i] === ' ' || target[i] === '\n') {
+                        lockTimes.push(0); // spaces lock immediately
+                    } else {
+                        lockTimes.push(0.3 + Math.random() * 0.7); // lock between 30-100% of duration
+                    }
+                }
+
+                el.textContent = '';
+
+                setTimeout(function() {
+                    var startTime = Date.now();
+                    var interval = setInterval(function() {
+                        var elapsed = Date.now() - startTime;
+                        var progress = Math.min(elapsed / duration, 1);
+                        var result = '';
+
+                        for (var i = 0; i < len; i++) {
+                            if (target[i] === ' ') {
+                                result += ' ';
+                            } else if (progress >= lockTimes[i]) {
+                                result += target[i];
+                            } else {
+                                result += chars[Math.floor(Math.random() * chars.length)];
+                            }
+                        }
+
+                        el.textContent = result;
+
+                        if (progress >= 1) {
+                            clearInterval(interval);
+                            el.textContent = target;
+                        }
+                    }, 70);
+                }, delay);
+            }
+
+            // For elements with <br> tags, we need to handle innerHTML
+            function scrambleHTML(el, duration, delay) {
+                var html = el.innerHTML;
+                var parts = html.split(/<br\s*\/?>/i);
+                var targets = parts.map(function(p) { return p.trim(); });
+                var fullTarget = targets.join('\n');
+                var len = fullTarget.length;
+
+                var lockTimes = [];
+                for (var i = 0; i < len; i++) {
+                    if (fullTarget[i] === ' ' || fullTarget[i] === '\n') {
+                        lockTimes.push(0);
+                    } else {
+                        lockTimes.push(0.3 + Math.random() * 0.7);
+                    }
+                }
+
+                el.textContent = '';
+
+                setTimeout(function() {
+                    var startTime = Date.now();
+                    var interval = setInterval(function() {
+                        var elapsed = Date.now() - startTime;
+                        var progress = Math.min(elapsed / duration, 1);
+                        var result = '';
+
+                        for (var i = 0; i < len; i++) {
+                            if (fullTarget[i] === '\n') {
+                                result += '\n';
+                            } else if (fullTarget[i] === ' ') {
+                                result += ' ';
+                            } else if (progress >= lockTimes[i]) {
+                                result += fullTarget[i];
+                            } else {
+                                result += chars[Math.floor(Math.random() * chars.length)];
+                            }
+                        }
+
+                        el.innerHTML = result.split('\n').join('<br>');
+
+                        if (progress >= 1) {
+                            clearInterval(interval);
+                            el.innerHTML = targets.join('<br>');
+                        }
+                    }, 70);
+                }, delay);
+            }
+
+            // Hero name
+            var line1 = document.querySelector('.hero-name .line1 span');
+            var line2 = document.querySelector('.hero-name .line2 span');
+            if (line1) scramble(line1, 'AARON', 750, 200);
+            if (line2) scramble(line2, 'ZHANG', 750, 400);
+
+            // Project titles — scramble when they become visible
+            var titleObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        var el = entry.target;
+                        titleObserver.unobserve(el);
+                        scrambleHTML(el, 500, 100);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.project-title, .contact-heading').forEach(function(el) {
+                titleObserver.observe(el);
+            });
+        })();
+
+        // GRID REVEAL SYSTEM
+        (function() {
+            function createGridOverlay(el, cols, rows, duration) {
+                el.style.position = el.style.position || 'relative';
+                if (getComputedStyle(el).position === 'static') {
+                    el.style.position = 'relative';
+                }
+
+                var overlay = document.createElement('div');
+                overlay.className = 'grid-reveal-overlay';
+                overlay.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+                overlay.style.gridTemplateRows = 'repeat(' + rows + ', 1fr)';
+
+                var total = cols * rows;
+                var cells = [];
+                for (var i = 0; i < total; i++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'cell';
+                    overlay.appendChild(cell);
+                    cells.push(cell);
+                }
+
+                el.appendChild(overlay);
+
+                // Shuffle order
+                var order = [];
+                for (var j = 0; j < total; j++) order.push(j);
+                for (var k = total - 1; k > 0; k--) {
+                    var r = Math.floor(Math.random() * (k + 1));
+                    var tmp = order[k]; order[k] = order[r]; order[r] = tmp;
+                }
+
+                // Reveal cells in batches
+                var perBatch = Math.ceil(total / (duration / 30));
+                var idx = 0;
+                var interval = setInterval(function() {
+                    for (var b = 0; b < perBatch && idx < total; b++, idx++) {
+                        cells[order[idx]].className = 'cell gone';
+                    }
+                    if (idx >= total) {
+                        clearInterval(interval);
+                        setTimeout(function() { overlay.remove(); }, 100);
+                    }
+                }, 30);
+            }
+
+            var revealObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        var el = entry.target;
+                        revealObserver.unobserve(el);
+                        el.classList.add('visible');
+
+                        // Grid reveal on main images only
+                        var mainImg = el.querySelector('.project-main');
+                        if (mainImg) createGridOverlay(mainImg, 12, 8, 400);
+
+                        // About photo
+                        var photo = el.querySelector('.about-photo');
+                        if (photo) createGridOverlay(photo, 10, 8, 400);
+                    }
+                });
+            }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+            document.querySelectorAll('[data-reveal]').forEach(function(el) {
+                revealObserver.observe(el);
+            });
+
+            // Sub-elements get their own observer
+            var subObserver = new IntersectionObserver(function(entries) {
+                entries.forEach(function(entry) {
+                    if (entry.isIntersecting) {
+                        var el = entry.target;
+                        subObserver.unobserve(el);
+
+                        // Stagger siblings if it's a sub-slot
+                        if (el.classList.contains('sub-slot')) {
+                            var siblings = el.parentElement.querySelectorAll('.sub-slot');
+                            siblings.forEach(function(sib, i) {
+                                subObserver.unobserve(sib);
+                                setTimeout(function() {
+                                    sib.classList.add('sub-visible');
+                                }, i * 150);
+                            });
+                        } else if (el.parentElement && el.parentElement.classList.contains('contact-links')) {
+                            var links = el.parentElement.querySelectorAll('a');
+                            links.forEach(function(link, i) {
+                                subObserver.unobserve(link);
+                                setTimeout(function() {
+                                    link.classList.add('sub-visible');
+                                }, i * 120);
+                            });
+                        } else {
+                            el.classList.add('sub-visible');
+                        }
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            document.querySelectorAll('.sub-slot, .project-info .label, .project-info .one-liner, .project-info .skills, .about-text .label, .about-text p, .contact-links a').forEach(function(el) {
+                subObserver.observe(el);
+            });
+        })();
+
+        // MORE TOGGLE
+        function toggleMore() {
+            const btn = document.getElementById('moreBtn');
+            const items = document.getElementById('moreItems');
+            btn.classList.toggle('open');
+            items.classList.toggle('open');
+        }
+
+        // PARALLAX ON PROJECT IMAGES
+        (function() {
+            const parallaxEls = document.querySelectorAll('[data-parallax] img');
+            function updateParallax() {
+                parallaxEls.forEach(function(img) {
+                    const rect = img.parentElement.getBoundingClientRect();
+                    const vh = window.innerHeight;
+                    const center = rect.top + rect.height / 2;
+                    const offset = (center - vh / 2) / vh;
+                    img.style.transform = 'translateY(' + (offset * -30) + 'px) scale(1.08)';
+                });
+            }
+            window.addEventListener('scroll', updateParallax, { passive: true });
+            updateParallax();
+        })();
+
+        // SCROLL-BASED COLOR FOCUS
+        function updateFocus() {
+            var viewportCenter = window.innerHeight / 2;
+            var threshold = window.innerHeight * 0.4;
+
+            document.querySelectorAll('.project-main, .project-subs .sub-slot, .about-photo').forEach(function(el) {
+                var rect = el.getBoundingClientRect();
+                var elCenter = rect.top + rect.height / 2;
+                var distance = Math.abs(elCenter - viewportCenter);
+
+                if (distance < threshold) {
+                    el.classList.add('in-focus');
+                } else {
+                    el.classList.remove('in-focus');
+                }
+            });
+        }
+
+        window.addEventListener('scroll', updateFocus, { passive: true });
+        updateFocus();
+
+        // CUSTOM CURSOR
+        (function() {
+            const size = 22;
+            const sw = 4;
+            const cursorEl = document.createElement('div');
+            cursorEl.id = 'custom-cursor';
+            const sideLen = size;
+            cursorEl.innerHTML = `<svg width="${size + sw}" height="${size + sw}" viewBox="0 0 ${size + sw} ${size + sw}">
+                <path d="M${sw/2} ${sw/2} L${size + sw/2} ${sw/2}" stroke="#f5f5f5" stroke-width="${sw}" stroke-linecap="square" fill="none"
+                    stroke-dasharray="${sideLen}" stroke-dashoffset="0"/>
+                <path d="M${size + sw/2} ${sw/2} L${size + sw/2} ${size + sw/2}" stroke="#f5f5f5" stroke-width="${sw}" stroke-linecap="square" fill="none"
+                    stroke-dasharray="${sideLen}" stroke-dashoffset="0"/>
+                <path d="M${size + sw/2} ${size + sw/2} L${sw/2} ${size + sw/2}" stroke="#f5f5f5" stroke-width="${sw}" stroke-linecap="square" fill="none"
+                    stroke-dasharray="${sideLen}" stroke-dashoffset="${sideLen}"/>
+                <path d="M${sw/2} ${size + sw/2} L${sw/2} ${sw/2}" stroke="#f5f5f5" stroke-width="${sw}" stroke-linecap="square" fill="none"
+                    stroke-dasharray="${sideLen}" stroke-dashoffset="${sideLen}"/>
+            </svg>`;
+            document.body.appendChild(cursorEl);
+
+            const paths = cursorEl.querySelectorAll('path');
+            const bottomLine = paths[2];
+            const leftLine = paths[3];
+
+            const offX = -(size + sw/2);
+            const offY = -sw/2;
+
+            cursorEl.style.transform = `translate(${window.innerWidth + offX}px, ${offY}px)`;
+
+            document.addEventListener('mousemove', function(e) {
+                cursorEl.style.transform = `translate(${e.clientX + offX}px, ${e.clientY + offY}px)`;
+            });
+
+            let hovering = false;
+            document.addEventListener('mouseover', function(e) {
+                const t = e.target.closest('a, button, [onclick], .more-toggle');
+                if (t && !hovering) {
+                    hovering = true;
+                    bottomLine.style.strokeDashoffset = '0';
+                    leftLine.style.strokeDashoffset = '0';
+                }
+            });
+            document.addEventListener('mouseout', function(e) {
+                const t = e.target.closest('a, button, [onclick], .more-toggle');
+                if (t && hovering) {
+                    const related = e.relatedTarget;
+                    if (!related || !related.closest('a, button, [onclick], .more-toggle')) {
+                        hovering = false;
+                        bottomLine.style.strokeDashoffset = sideLen;
+                        leftLine.style.strokeDashoffset = sideLen;
+                    }
+                }
+            });
+        })();
+
+        // INERTIA SCROLL (disabled on touch/mobile devices)
+        (function() {
+            var isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.matchMedia('(hover: none)').matches;
+            var wrapper = document.getElementById('smoothWrapper');
+            if (!wrapper) return;
+
+            if (isTouchDevice) {
+                // On mobile, remove fixed positioning so native scroll works
+                wrapper.style.position = 'relative';
+                return;
+            }
+
+            var current = 0;
+            var target = 0;
+            var ease = 0.08;
+            var rafId;
+
+            function setBodyHeight() {
+                document.body.style.height = wrapper.scrollHeight + 'px';
+            }
+
+            function smoothScroll() {
+                target = window.scrollY;
+                current += (target - current) * ease;
+                // Round to avoid sub-pixel jitter
+                current = Math.round(current * 100) / 100;
+                wrapper.style.transform = 'translateY(' + (-current) + 'px)';
+                rafId = requestAnimationFrame(smoothScroll);
+            }
+
+            setBodyHeight();
+            window.addEventListener('resize', setBodyHeight);
+            // Recalc on content changes (e.g. MORE toggle)
+            var mo = new MutationObserver(setBodyHeight);
+            mo.observe(wrapper, { childList: true, subtree: true, attributes: true });
+
+            smoothScroll();
+        })();
+
+    </script>
+</body>
+</html>
